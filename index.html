@@ -524,69 +524,58 @@
     <script src="js/contact.js"></script>
     <script src="js/scripts.js"></script>
 
-    <!-- CINDR TOKEN FLAME EFFECT - Minimal & Realistic -->
+    <!-- CINDR TOKEN TEXT FIRE EFFECT -->
     <style>
-        /* Minimal realistic flame effect */
+        /* Text fire effect for CINDR Token */
         .cindr-burn-effect {
             position: relative;
-            overflow: hidden;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
         }
 
-        .cindr-burn-effect::before {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 20px;
-            height: 30px;
+        .cindr-burn-effect:hover .team-member div em {
             background: linear-gradient(
-                to top,
-                rgba(255, 100, 0, 0.8) 0%,
-                rgba(255, 150, 0, 0.6) 40%,
-                rgba(255, 200, 0, 0.4) 70%,
-                rgba(255, 255, 150, 0.2) 90%,
-                transparent 100%
+                45deg,
+                #ff4500 0%,
+                #ff6600 25%,
+                #ffaa00 50%,
+                #ffff00 75%,
+                #ffffff 100%
             );
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            transform: translateX(-50%);
-            opacity: 0;
-            pointer-events: none;
-            animation: minimalFlame 2s ease-in-out infinite;
-            filter: blur(0.5px);
-            z-index: 1;
+            background-size: 200% 200%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textFire 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 100, 0, 0.6));
         }
 
-        .cindr-burn-effect:hover::before {
-            opacity: 0.7;
+        .cindr-burn-effect:hover .team-member div span {
+            color: rgba(255, 150, 0, 0.9);
+            text-shadow: 0 0 10px rgba(255, 100, 0, 0.5);
         }
 
-        .cindr-burn-effect:hover {
-            transform: translateY(-1px);
-        }
-
-        @keyframes minimalFlame {
+        @keyframes textFire {
             0%, 100% {
-                transform: translateX(-50%) scaleY(0.8) rotate(-2deg);
-                opacity: 0.4;
+                background-position: 0% 50%;
+                filter: drop-shadow(0 0 8px rgba(255, 100, 0, 0.6));
             }
             25% {
-                transform: translateX(-50%) scaleY(1.1) rotate(1deg);
-                opacity: 0.7;
+                background-position: 100% 50%;
+                filter: drop-shadow(0 0 12px rgba(255, 150, 0, 0.8));
             }
             50% {
-                transform: translateX(-50%) scaleY(0.9) rotate(-1deg);
-                opacity: 0.6;
+                background-position: 50% 0%;
+                filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.7));
             }
             75% {
-                transform: translateX(-50%) scaleY(1.05) rotate(0.5deg);
-                opacity: 0.75;
+                background-position: 50% 100%;
+                filter: drop-shadow(0 0 14px rgba(255, 180, 0, 0.9));
             }
         }
 
-        /* Add subtle glow on hover */
+        /* Subtle hover lift effect */
         .cindr-burn-effect:hover {
-            box-shadow: 0 0 15px rgba(255, 100, 0, 0.3);
+            transform: translateY(-2px);
         }
     </style>
 
