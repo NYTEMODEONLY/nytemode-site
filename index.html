@@ -524,8 +524,35 @@
     <script src="js/contact.js"></script>
     <script src="js/scripts.js"></script>
 
-    <!-- CINDR TOKEN TEXT FIRE EFFECT -->
+    <!-- NYTEMODE LED GLOW EFFECT & CINDR TOKEN TEXT FIRE EFFECT -->
     <style>
+        /* LED Glow Effect for NYTEMODE text */
+        .hero-title span {
+            animation: ledGlow 3s ease-in-out infinite;
+            text-shadow:
+                0 0 5px rgba(124, 81, 157, 0.8),
+                0 0 10px rgba(124, 81, 157, 0.6),
+                0 0 15px rgba(124, 81, 157, 0.4),
+                0 0 20px rgba(124, 81, 157, 0.2);
+        }
+
+        @keyframes ledGlow {
+            0%, 100% {
+                text-shadow:
+                    0 0 5px rgba(124, 81, 157, 0.8),
+                    0 0 10px rgba(124, 81, 157, 0.6),
+                    0 0 15px rgba(124, 81, 157, 0.4),
+                    0 0 20px rgba(124, 81, 157, 0.2);
+            }
+            50% {
+                text-shadow:
+                    0 0 10px rgba(124, 81, 157, 0.9),
+                    0 0 20px rgba(124, 81, 157, 0.8),
+                    0 0 30px rgba(124, 81, 157, 0.6),
+                    0 0 40px rgba(124, 81, 157, 0.4);
+            }
+        }
+
         /* Text fire effect for CINDR Token */
         .cindr-burn-effect {
             position: relative;
