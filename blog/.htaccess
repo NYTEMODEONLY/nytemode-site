@@ -1,0 +1,6 @@
+
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^blog\.nytemode\.com$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.blog\.nytemode\.com$
+RewriteRule ^/?$ "https\:\/\/medium\.com\/\@nytemode" [R=301,L]
+
