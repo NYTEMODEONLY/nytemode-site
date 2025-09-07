@@ -524,243 +524,104 @@
     <script src="js/contact.js"></script>
     <script src="js/scripts.js"></script>
 
-    <!-- CINDR TOKEN FLAME EFFECT -->
+    <!-- CINDR TOKEN FIRE EFFECT -->
+    <style>
+        /* CINDR Token Fire Animation - Adapted from CodePen */
+        :root {
+            --cindr-glitter: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .cindr-burn-effect.cindr-fire::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                var(--cindr-glitter),
+                var(--cindr-glitter),
+                linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.3) 0px,
+                    rgba(255, 120, 0, 0.8) 5px,
+                    rgba(255, 80, 0, 0.6) 30%,
+                    rgba(200, 50, 0, 0.2) 60%,
+                    transparent 80%
+                ),
+                radial-gradient(ellipse at bottom, transparent 40%, rgba(150, 30, 0, 0.3) 70%);
+            background-size: 200px 300px, 250px 400px, 100% 100%, 100% 100%;
+            background-blend-mode: hard-light, color-dodge, multiply;
+            background-position: 0px 0px, 0px 0px, 50% 100%, center center;
+            background-repeat: repeat, repeat, repeat, no-repeat;
+            mix-blend-mode: color-dodge;
+            filter: brightness(2.5) blur(3px) contrast(4);
+            animation: cindrFire 2s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .cindr-burn-effect.cindr-fire::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at bottom, rgba(255, 80, 0, 0.4) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .cindr-burn-effect.cindr-fire::before,
+        .cindr-burn-effect.cindr-fire::after {
+            pointer-events: none;
+        }
+
+        .cindr-burn-effect.cindr-fire:hover::before {
+            opacity: 0.8;
+        }
+
+        .cindr-burn-effect.cindr-fire:hover::after {
+            opacity: 0.6;
+        }
+
+        @keyframes cindrFire {
+            0% {
+                background-position: center 0px, center 0px, 50% 100%, center center;
+                transform: scaleY(0.8);
+            }
+            50% {
+                background-position: center -150px, center -200px, 50% 100%, center center;
+                transform: scaleY(1.1);
+            }
+            100% {
+                background-position: center -300px, center -400px, 50% 100%, center center;
+                transform: scaleY(0.8);
+            }
+        }
+    </style>
+
     <script>
-        // Realistic flame effect using SVG for CINDR Token
-        class CindrFlameEffect {
+        // Simple CSS class toggle for CINDR Token fire effect
+        class CindrFireEffect {
             constructor() {
                 this.cindrElement = document.querySelector('.cindr-burn-effect');
-                this.flames = [];
-                this.embers = [];
-                this.isActive = false;
-                this.flameInterval = null;
                 this.init();
             }
 
             init() {
                 if (this.cindrElement) {
                     this.cindrElement.addEventListener('mouseenter', () => {
-                        this.startBurning();
-                        this.isActive = true;
+                        this.cindrElement.classList.add('cindr-fire');
                     });
 
                     this.cindrElement.addEventListener('mouseleave', () => {
-                        this.stopBurning();
-                        this.isActive = false;
+                        this.cindrElement.classList.remove('cindr-fire');
                     });
                 }
-            }
-
-            startBurning() {
-                // Add glow effect
-                this.cindrElement.style.boxShadow = '0 0 30px rgba(255, 80, 0, 0.7), 0 0 60px rgba(255, 120, 0, 0.4), 0 0 90px rgba(255, 160, 0, 0.2)';
-                this.cindrElement.style.transform = 'scale(1.03)';
-                this.cindrElement.style.transition = 'all 0.3s ease';
-
-                // Create initial flames
-                this.createInitialFlames();
-
-                // Start continuous flame generation
-                this.flameInterval = setInterval(() => {
-                    if (this.isActive) {
-                        this.createFlame();
-                        if (Math.random() < 0.4) {
-                            this.createEmber();
-                        }
-                    }
-                }, 180);
-            }
-
-            createInitialFlames() {
-                for (let i = 0; i < 6; i++) {
-                    setTimeout(() => {
-                        if (this.isActive) {
-                            this.createFlame();
-                        }
-                    }, i * 120);
-                }
-            }
-
-            createFlame() {
-                const rect = this.cindrElement.getBoundingClientRect();
-                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.7;
-                const bottomY = rect.bottom - 3;
-
-                // Create SVG flame with realistic shape
-                const flameSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                flameSvg.setAttribute('width', '24');
-                flameSvg.setAttribute('height', '40');
-                flameSvg.setAttribute('viewBox', '0 0 24 40');
-                flameSvg.style.cssText = `
-                    position: absolute;
-                    pointer-events: none;
-                    z-index: 1000;
-                    left: ${bottomX - 12}px;
-                    top: ${bottomY - 35}px;
-                    animation: flameDance 1.8s ease-out forwards;
-                    opacity: 0;
-                `;
-
-                // Create flame path with realistic shape
-                const flamePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                const flameShape = this.generateFlamePath();
-                flamePath.setAttribute('d', flameShape);
-                flamePath.setAttribute('fill', 'url(#flameGradient)');
-                flamePath.setAttribute('opacity', '0.85');
-
-                // Create gradient
-                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-                gradient.setAttribute('id', 'flameGradient');
-                gradient.setAttribute('x1', '0%');
-                gradient.setAttribute('y1', '100%');
-                gradient.setAttribute('x2', '0%');
-                gradient.setAttribute('y2', '0%');
-
-                const stops = [
-                    { offset: '0%', color: '#ff3300' },
-                    { offset: '30%', color: '#ff6600' },
-                    { offset: '60%', color: '#ffaa00' },
-                    { offset: '85%', color: '#ffff00' },
-                    { offset: '100%', color: 'rgba(255,255,255,0)' }
-                ];
-
-                stops.forEach(stop => {
-                    const stopEl = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                    stopEl.setAttribute('offset', stop.offset);
-                    stopEl.setAttribute('stop-color', stop.color);
-                    gradient.appendChild(stopEl);
-                });
-
-                defs.appendChild(gradient);
-                flameSvg.appendChild(defs);
-                flameSvg.appendChild(flamePath);
-
-                // Add flame animation CSS
-                if (!document.querySelector('#flame-styles')) {
-                    const style = document.createElement('style');
-                    style.id = 'flame-styles';
-                    style.textContent = `
-                        @keyframes flameDance {
-                            0% {
-                                opacity: 0;
-                                transform: scale(0.2) translateY(30px) rotate(0deg);
-                            }
-                            15% {
-                                opacity: 0.9;
-                                transform: scale(0.8) translateY(20px) rotate(${Math.random() * 15 - 7.5}deg);
-                            }
-                            40% {
-                                opacity: 0.95;
-                                transform: scale(1) translateY(0px) rotate(${Math.random() * 20 - 10}deg);
-                            }
-                            70% {
-                                opacity: 0.8;
-                                transform: scale(1.1) translateY(-15px) rotate(${Math.random() * 25 - 12.5}deg);
-                            }
-                            100% {
-                                opacity: 0;
-                                transform: scale(0.3) translateY(-45px) rotate(${Math.random() * 30 - 15}deg);
-                            }
-                        }
-                        @keyframes emberDrift {
-                            0% {
-                                opacity: 1;
-                                transform: scale(1) translateY(0px) translateX(0px);
-                            }
-                            50% {
-                                opacity: 0.8;
-                                transform: scale(1.2) translateY(-25px) translateX(${Math.random() * 20 - 10}px);
-                            }
-                            100% {
-                                opacity: 0;
-                                transform: scale(0.4) translateY(-60px) translateX(${Math.random() * 40 - 20}px);
-                            }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-
-                document.body.appendChild(flameSvg);
-                this.flames.push(flameSvg);
-
-                // Remove flame after animation
-                setTimeout(() => {
-                    if (flameSvg.parentNode) {
-                        flameSvg.parentNode.removeChild(flameSvg);
-                        this.flames = this.flames.filter(f => f !== flameSvg);
-                    }
-                }, 1800);
-            }
-
-            generateFlamePath() {
-                // Create more realistic flame shapes
-                const variations = [
-                    'M12 40 Q8 30 10 20 Q9 15 11 10 Q10 5 12 0 Q14 5 13 10 Q15 15 14 20 Q16 30 12 40',
-                    'M12 40 Q9 32 8 24 Q10 18 9 12 Q11 6 12 0 Q13 6 14 12 Q16 18 15 24 Q14 32 12 40',
-                    'M12 40 Q10 35 11 28 Q9 22 10 16 Q8 10 12 0 Q16 10 15 16 Q17 22 16 28 Q15 35 12 40'
-                ];
-                return variations[Math.floor(Math.random() * variations.length)];
-            }
-
-            createEmber() {
-                const rect = this.cindrElement.getBoundingClientRect();
-                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.5;
-                const bottomY = rect.bottom - 5;
-
-                const ember = document.createElement('div');
-                ember.className = 'cindr-ember';
-                ember.style.cssText = `
-                    position: absolute;
-                    width: 4px;
-                    height: 4px;
-                    background: radial-gradient(circle, #ff5500 0%, #ff3300 50%, #cc2200 100%);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 1001;
-                    left: ${bottomX}px;
-                    top: ${bottomY}px;
-                    animation: emberDrift ${2.5 + Math.random() * 1}s ease-out forwards;
-                    box-shadow: 0 0 6px rgba(255, 85, 0, 0.9), 0 0 12px rgba(255, 120, 0, 0.6);
-                `;
-
-                document.body.appendChild(ember);
-                this.embers.push(ember);
-
-                // Remove ember after animation
-                setTimeout(() => {
-                    if (ember.parentNode) {
-                        ember.parentNode.removeChild(ember);
-                        this.embers = this.embers.filter(e => e !== ember);
-                    }
-                }, 4000);
-            }
-
-            stopBurning() {
-                // Remove glow and scale effects
-                this.cindrElement.style.boxShadow = '';
-                this.cindrElement.style.transform = '';
-
-                // Clear flame generation interval
-                if (this.flameInterval) {
-                    clearInterval(this.flameInterval);
-                    this.flameInterval = null;
-                }
-
-                // Remove all flames and embers
-                [...this.flames, ...this.embers].forEach(element => {
-                    if (element.parentNode) {
-                        element.parentNode.removeChild(element);
-                    }
-                });
-                this.flames = [];
-                this.embers = [];
             }
         }
 
         // Initialize effect when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new CindrFlameEffect();
+            new CindrFireEffect();
         });
     </script>
 
