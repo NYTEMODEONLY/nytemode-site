@@ -526,128 +526,194 @@
 
     <!-- CINDR TOKEN BURNING EFFECT -->
     <script>
-        // Simple CSS-based burning effect for CINDR Token
-        class CindrBurnEffect {
+        // Flames from bottom effect for CINDR Token
+        class CindrFlameEffect {
             constructor() {
                 this.cindrElement = document.querySelector('.cindr-burn-effect');
-                this.particles = [];
+                this.flames = [];
+                this.embers = [];
                 this.isActive = false;
+                this.flameInterval = null;
                 this.init();
             }
 
             init() {
                 if (this.cindrElement) {
-                    this.cindrElement.addEventListener('mouseenter', (e) => {
-                        this.createBurningEffect(e);
+                    this.cindrElement.addEventListener('mouseenter', () => {
+                        this.startBurning();
                         this.isActive = true;
                     });
 
-                    this.cindrElement.addEventListener('mousemove', (e) => {
-                        if (this.isActive) {
-                            this.updateParticles(e);
-                        }
-                    });
-
                     this.cindrElement.addEventListener('mouseleave', () => {
-                        this.removeBurningEffect();
+                        this.stopBurning();
                         this.isActive = false;
                     });
                 }
             }
 
-            createBurningEffect(e) {
-                const rect = this.cindrElement.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-
-                // Create fire particles
-                for (let i = 0; i < 15; i++) {
-                    this.createParticle(centerX, centerY);
-                }
-
-                // Add glow effect to the element
-                this.cindrElement.style.boxShadow = '0 0 20px rgba(255, 100, 0, 0.5)';
+            startBurning() {
+                // Add glow effect
+                this.cindrElement.style.boxShadow = '0 0 25px rgba(255, 100, 0, 0.6), 0 0 50px rgba(255, 150, 0, 0.3)';
                 this.cindrElement.style.transform = 'scale(1.02)';
                 this.cindrElement.style.transition = 'all 0.3s ease';
-            }
 
-            createParticle(x, y) {
-                const particle = document.createElement('div');
-                particle.className = 'cindr-particle';
-                particle.style.cssText = `
-                    position: absolute;
-                    width: 4px;
-                    height: 4px;
-                    background: radial-gradient(circle, #ff4500 0%, #ff6600 50%, #ff8800 100%);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 1000;
-                    left: ${x}px;
-                    top: ${y}px;
-                    animation: burnParticle 1s ease-out forwards;
-                `;
+                // Create initial flames
+                this.createInitialFlames();
 
-                // Add CSS animation
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes burnParticle {
-                        0% {
-                            opacity: 1;
-                            transform: scale(1) translate(0, 0);
-                        }
-                        50% {
-                            opacity: 0.8;
-                            transform: scale(1.5) translate(${Math.random() * 40 - 20}px, ${Math.random() * -30 - 10}px);
-                        }
-                        100% {
-                            opacity: 0;
-                            transform: scale(0.5) translate(${Math.random() * 60 - 30}px, ${Math.random() * -50 - 20}px);
+                // Start continuous flame generation
+                this.flameInterval = setInterval(() => {
+                    if (this.isActive) {
+                        this.createFlame();
+                        if (Math.random() < 0.3) {
+                            this.createEmber();
                         }
                     }
-                `;
-                document.head.appendChild(style);
-
-                document.body.appendChild(particle);
-                this.particles.push(particle);
-
-                // Remove particle after animation
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                        this.particles = this.particles.filter(p => p !== particle);
-                    }
-                }, 1000);
+                }, 200);
             }
 
-            updateParticles(e) {
-                const rect = this.cindrElement.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-
-                // Create new particles occasionally while moving
-                if (Math.random() < 0.3) {
-                    this.createParticle(centerX + (Math.random() - 0.5) * 20, centerY);
+            createInitialFlames() {
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        if (this.isActive) {
+                            this.createFlame();
+                        }
+                    }, i * 100);
                 }
             }
 
-            removeBurningEffect() {
+            createFlame() {
+                const rect = this.cindrElement.getBoundingClientRect();
+                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.6;
+                const bottomY = rect.bottom - 5;
+
+                const flame = document.createElement('div');
+                flame.className = 'cindr-flame';
+                flame.style.cssText = `
+                    position: absolute;
+                    width: ${6 + Math.random() * 8}px;
+                    height: ${20 + Math.random() * 30}px;
+                    background: linear-gradient(to top,
+                        rgba(255, 100, 0, 0.9) 0%,
+                        rgba(255, 150, 0, 0.8) 30%,
+                        rgba(255, 200, 0, 0.6) 60%,
+                        rgba(255, 255, 100, 0.3) 90%,
+                        rgba(255, 255, 255, 0) 100%);
+                    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                    pointer-events: none;
+                    z-index: 1000;
+                    left: ${bottomX}px;
+                    top: ${bottomY}px;
+                    animation: flameRise 1.5s ease-out forwards;
+                    transform-origin: bottom center;
+                `;
+
+                // Add flame animation CSS
+                if (!document.querySelector('#flame-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'flame-styles';
+                    style.textContent = `
+                        @keyframes flameRise {
+                            0% {
+                                opacity: 0;
+                                transform: scale(0.3) translateY(0px) rotate(0deg);
+                            }
+                            20% {
+                                opacity: 0.9;
+                                transform: scale(1) translateY(-10px) rotate(${Math.random() * 20 - 10}deg);
+                            }
+                            60% {
+                                opacity: 0.7;
+                                transform: scale(1.1) translateY(-25px) rotate(${Math.random() * 30 - 15}deg);
+                            }
+                            100% {
+                                opacity: 0;
+                                transform: scale(0.2) translateY(-50px) rotate(${Math.random() * 40 - 20}deg);
+                            }
+                        }
+                        @keyframes emberFloat {
+                            0% {
+                                opacity: 1;
+                                transform: scale(1) translateY(0px);
+                            }
+                            100% {
+                                opacity: 0;
+                                transform: scale(0.3) translateY(-80px) translateX(${Math.random() * 60 - 30}px);
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                document.body.appendChild(flame);
+                this.flames.push(flame);
+
+                // Remove flame after animation
+                setTimeout(() => {
+                    if (flame.parentNode) {
+                        flame.parentNode.removeChild(flame);
+                        this.flames = this.flames.filter(f => f !== flame);
+                    }
+                }, 1500);
+            }
+
+            createEmber() {
+                const rect = this.cindrElement.getBoundingClientRect();
+                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.4;
+                const bottomY = rect.bottom - 5;
+
+                const ember = document.createElement('div');
+                ember.className = 'cindr-ember';
+                ember.style.cssText = `
+                    position: absolute;
+                    width: 3px;
+                    height: 3px;
+                    background: radial-gradient(circle, #ff6600 0%, #ff4400 100%);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 1001;
+                    left: ${bottomX}px;
+                    top: ${bottomY}px;
+                    animation: emberFloat ${2 + Math.random() * 1.5}s ease-out forwards;
+                    box-shadow: 0 0 4px rgba(255, 100, 0, 0.8);
+                `;
+
+                document.body.appendChild(ember);
+                this.embers.push(ember);
+
+                // Remove ember after animation
+                setTimeout(() => {
+                    if (ember.parentNode) {
+                        ember.parentNode.removeChild(ember);
+                        this.embers = this.embers.filter(e => e !== ember);
+                    }
+                }, 3500);
+            }
+
+            stopBurning() {
                 // Remove glow and scale effects
                 this.cindrElement.style.boxShadow = '';
                 this.cindrElement.style.transform = '';
 
-                // Remove any remaining particles
-                this.particles.forEach(particle => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
+                // Clear flame generation interval
+                if (this.flameInterval) {
+                    clearInterval(this.flameInterval);
+                    this.flameInterval = null;
+                }
+
+                // Remove all flames and embers
+                [...this.flames, ...this.embers].forEach(element => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
                     }
                 });
-                this.particles = [];
+                this.flames = [];
+                this.embers = [];
             }
         }
 
         // Initialize effect when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new CindrBurnEffect();
+            new CindrFlameEffect();
         });
     </script>
 
