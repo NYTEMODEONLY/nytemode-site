@@ -524,106 +524,71 @@
     <script src="js/contact.js"></script>
     <script src="js/scripts.js"></script>
 
-    <!-- CINDR TOKEN FIRE EFFECT -->
+    <!-- CINDR TOKEN FLAME EFFECT - Minimal & Realistic -->
     <style>
-        /* CINDR Token Fire Animation - Adapted from CodePen */
-        :root {
-            --cindr-glitter: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        /* Minimal realistic flame effect */
+        .cindr-burn-effect {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
         }
 
-        .cindr-burn-effect.cindr-fire::before {
+        .cindr-burn-effect::before {
             content: "";
             position: absolute;
-            inset: 0;
-            background-image:
-                var(--cindr-glitter),
-                var(--cindr-glitter),
-                linear-gradient(
-                    0deg,
-                    rgba(255, 255, 255, 0.3) 0px,
-                    rgba(255, 120, 0, 0.8) 5px,
-                    rgba(255, 80, 0, 0.6) 30%,
-                    rgba(200, 50, 0, 0.2) 60%,
-                    transparent 80%
-                ),
-                radial-gradient(ellipse at bottom, transparent 40%, rgba(150, 30, 0, 0.3) 70%);
-            background-size: 200px 300px, 250px 400px, 100% 100%, 100% 100%;
-            background-blend-mode: hard-light, color-dodge, multiply;
-            background-position: 0px 0px, 0px 0px, 50% 100%, center center;
-            background-repeat: repeat, repeat, repeat, no-repeat;
-            mix-blend-mode: color-dodge;
-            filter: brightness(2.5) blur(3px) contrast(4);
-            animation: cindrFire 2s linear infinite;
+            bottom: 0;
+            left: 50%;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(
+                to top,
+                rgba(255, 100, 0, 0.8) 0%,
+                rgba(255, 150, 0, 0.6) 40%,
+                rgba(255, 200, 0, 0.4) 70%,
+                rgba(255, 255, 150, 0.2) 90%,
+                transparent 100%
+            );
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform: translateX(-50%);
             opacity: 0;
-            transition: opacity 0.3s ease;
-            border-radius: inherit;
-        }
-
-        .cindr-burn-effect.cindr-fire::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at bottom, rgba(255, 80, 0, 0.4) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            border-radius: inherit;
-        }
-
-        .cindr-burn-effect.cindr-fire::before,
-        .cindr-burn-effect.cindr-fire::after {
             pointer-events: none;
+            animation: minimalFlame 2s ease-in-out infinite;
+            filter: blur(0.5px);
+            z-index: 1;
         }
 
-        .cindr-burn-effect.cindr-fire:hover::before {
-            opacity: 0.8;
+        .cindr-burn-effect:hover::before {
+            opacity: 0.7;
         }
 
-        .cindr-burn-effect.cindr-fire:hover::after {
-            opacity: 0.6;
+        .cindr-burn-effect:hover {
+            transform: translateY(-1px);
         }
 
-        @keyframes cindrFire {
-            0% {
-                background-position: center 0px, center 0px, 50% 100%, center center;
-                transform: scaleY(0.8);
+        @keyframes minimalFlame {
+            0%, 100% {
+                transform: translateX(-50%) scaleY(0.8) rotate(-2deg);
+                opacity: 0.4;
+            }
+            25% {
+                transform: translateX(-50%) scaleY(1.1) rotate(1deg);
+                opacity: 0.7;
             }
             50% {
-                background-position: center -150px, center -200px, 50% 100%, center center;
-                transform: scaleY(1.1);
+                transform: translateX(-50%) scaleY(0.9) rotate(-1deg);
+                opacity: 0.6;
             }
-            100% {
-                background-position: center -300px, center -400px, 50% 100%, center center;
-                transform: scaleY(0.8);
+            75% {
+                transform: translateX(-50%) scaleY(1.05) rotate(0.5deg);
+                opacity: 0.75;
             }
+        }
+
+        /* Add subtle glow on hover */
+        .cindr-burn-effect:hover {
+            box-shadow: 0 0 15px rgba(255, 100, 0, 0.3);
         }
     </style>
-
-    <script>
-        // Simple CSS class toggle for CINDR Token fire effect
-        class CindrFireEffect {
-            constructor() {
-                this.cindrElement = document.querySelector('.cindr-burn-effect');
-                this.init();
-            }
-
-            init() {
-                if (this.cindrElement) {
-                    this.cindrElement.addEventListener('mouseenter', () => {
-                        this.cindrElement.classList.add('cindr-fire');
-                    });
-
-                    this.cindrElement.addEventListener('mouseleave', () => {
-                        this.cindrElement.classList.remove('cindr-fire');
-                    });
-                }
-            }
-        }
-
-        // Initialize effect when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            new CindrFireEffect();
-        });
-    </script>
 
 
 
