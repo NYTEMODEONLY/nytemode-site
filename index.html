@@ -524,9 +524,9 @@
     <script src="js/contact.js"></script>
     <script src="js/scripts.js"></script>
 
-    <!-- CINDR TOKEN BURNING EFFECT -->
+    <!-- CINDR TOKEN FLAME EFFECT -->
     <script>
-        // Flames from bottom effect for CINDR Token
+        // Realistic flame effect using SVG for CINDR Token
         class CindrFlameEffect {
             constructor() {
                 this.cindrElement = document.querySelector('.cindr-burn-effect');
@@ -553,8 +553,8 @@
 
             startBurning() {
                 // Add glow effect
-                this.cindrElement.style.boxShadow = '0 0 25px rgba(255, 100, 0, 0.6), 0 0 50px rgba(255, 150, 0, 0.3)';
-                this.cindrElement.style.transform = 'scale(1.02)';
+                this.cindrElement.style.boxShadow = '0 0 30px rgba(255, 80, 0, 0.7), 0 0 60px rgba(255, 120, 0, 0.4), 0 0 90px rgba(255, 160, 0, 0.2)';
+                this.cindrElement.style.transform = 'scale(1.03)';
                 this.cindrElement.style.transition = 'all 0.3s ease';
 
                 // Create initial flames
@@ -564,117 +564,164 @@
                 this.flameInterval = setInterval(() => {
                     if (this.isActive) {
                         this.createFlame();
-                        if (Math.random() < 0.3) {
+                        if (Math.random() < 0.4) {
                             this.createEmber();
                         }
                     }
-                }, 200);
+                }, 180);
             }
 
             createInitialFlames() {
-                for (let i = 0; i < 8; i++) {
+                for (let i = 0; i < 6; i++) {
                     setTimeout(() => {
                         if (this.isActive) {
                             this.createFlame();
                         }
-                    }, i * 100);
+                    }, i * 120);
                 }
             }
 
             createFlame() {
                 const rect = this.cindrElement.getBoundingClientRect();
-                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.6;
-                const bottomY = rect.bottom - 5;
+                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.7;
+                const bottomY = rect.bottom - 3;
 
-                const flame = document.createElement('div');
-                flame.className = 'cindr-flame';
-                flame.style.cssText = `
+                // Create SVG flame with realistic shape
+                const flameSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                flameSvg.setAttribute('width', '24');
+                flameSvg.setAttribute('height', '40');
+                flameSvg.setAttribute('viewBox', '0 0 24 40');
+                flameSvg.style.cssText = `
                     position: absolute;
-                    width: ${6 + Math.random() * 8}px;
-                    height: ${20 + Math.random() * 30}px;
-                    background: linear-gradient(to top,
-                        rgba(255, 100, 0, 0.9) 0%,
-                        rgba(255, 150, 0, 0.8) 30%,
-                        rgba(255, 200, 0, 0.6) 60%,
-                        rgba(255, 255, 100, 0.3) 90%,
-                        rgba(255, 255, 255, 0) 100%);
-                    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
                     pointer-events: none;
                     z-index: 1000;
-                    left: ${bottomX}px;
-                    top: ${bottomY}px;
-                    animation: flameRise 1.5s ease-out forwards;
-                    transform-origin: bottom center;
+                    left: ${bottomX - 12}px;
+                    top: ${bottomY - 35}px;
+                    animation: flameDance 1.8s ease-out forwards;
+                    opacity: 0;
                 `;
+
+                // Create flame path with realistic shape
+                const flamePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const flameShape = this.generateFlamePath();
+                flamePath.setAttribute('d', flameShape);
+                flamePath.setAttribute('fill', 'url(#flameGradient)');
+                flamePath.setAttribute('opacity', '0.85');
+
+                // Create gradient
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                gradient.setAttribute('id', 'flameGradient');
+                gradient.setAttribute('x1', '0%');
+                gradient.setAttribute('y1', '100%');
+                gradient.setAttribute('x2', '0%');
+                gradient.setAttribute('y2', '0%');
+
+                const stops = [
+                    { offset: '0%', color: '#ff3300' },
+                    { offset: '30%', color: '#ff6600' },
+                    { offset: '60%', color: '#ffaa00' },
+                    { offset: '85%', color: '#ffff00' },
+                    { offset: '100%', color: 'rgba(255,255,255,0)' }
+                ];
+
+                stops.forEach(stop => {
+                    const stopEl = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                    stopEl.setAttribute('offset', stop.offset);
+                    stopEl.setAttribute('stop-color', stop.color);
+                    gradient.appendChild(stopEl);
+                });
+
+                defs.appendChild(gradient);
+                flameSvg.appendChild(defs);
+                flameSvg.appendChild(flamePath);
 
                 // Add flame animation CSS
                 if (!document.querySelector('#flame-styles')) {
                     const style = document.createElement('style');
                     style.id = 'flame-styles';
                     style.textContent = `
-                        @keyframes flameRise {
+                        @keyframes flameDance {
                             0% {
                                 opacity: 0;
-                                transform: scale(0.3) translateY(0px) rotate(0deg);
+                                transform: scale(0.2) translateY(30px) rotate(0deg);
                             }
-                            20% {
+                            15% {
                                 opacity: 0.9;
-                                transform: scale(1) translateY(-10px) rotate(${Math.random() * 20 - 10}deg);
+                                transform: scale(0.8) translateY(20px) rotate(${Math.random() * 15 - 7.5}deg);
                             }
-                            60% {
-                                opacity: 0.7;
-                                transform: scale(1.1) translateY(-25px) rotate(${Math.random() * 30 - 15}deg);
+                            40% {
+                                opacity: 0.95;
+                                transform: scale(1) translateY(0px) rotate(${Math.random() * 20 - 10}deg);
+                            }
+                            70% {
+                                opacity: 0.8;
+                                transform: scale(1.1) translateY(-15px) rotate(${Math.random() * 25 - 12.5}deg);
                             }
                             100% {
                                 opacity: 0;
-                                transform: scale(0.2) translateY(-50px) rotate(${Math.random() * 40 - 20}deg);
+                                transform: scale(0.3) translateY(-45px) rotate(${Math.random() * 30 - 15}deg);
                             }
                         }
-                        @keyframes emberFloat {
+                        @keyframes emberDrift {
                             0% {
                                 opacity: 1;
-                                transform: scale(1) translateY(0px);
+                                transform: scale(1) translateY(0px) translateX(0px);
+                            }
+                            50% {
+                                opacity: 0.8;
+                                transform: scale(1.2) translateY(-25px) translateX(${Math.random() * 20 - 10}px);
                             }
                             100% {
                                 opacity: 0;
-                                transform: scale(0.3) translateY(-80px) translateX(${Math.random() * 60 - 30}px);
+                                transform: scale(0.4) translateY(-60px) translateX(${Math.random() * 40 - 20}px);
                             }
                         }
                     `;
                     document.head.appendChild(style);
                 }
 
-                document.body.appendChild(flame);
-                this.flames.push(flame);
+                document.body.appendChild(flameSvg);
+                this.flames.push(flameSvg);
 
                 // Remove flame after animation
                 setTimeout(() => {
-                    if (flame.parentNode) {
-                        flame.parentNode.removeChild(flame);
-                        this.flames = this.flames.filter(f => f !== flame);
+                    if (flameSvg.parentNode) {
+                        flameSvg.parentNode.removeChild(flameSvg);
+                        this.flames = this.flames.filter(f => f !== flameSvg);
                     }
-                }, 1500);
+                }, 1800);
+            }
+
+            generateFlamePath() {
+                // Create more realistic flame shapes
+                const variations = [
+                    'M12 40 Q8 30 10 20 Q9 15 11 10 Q10 5 12 0 Q14 5 13 10 Q15 15 14 20 Q16 30 12 40',
+                    'M12 40 Q9 32 8 24 Q10 18 9 12 Q11 6 12 0 Q13 6 14 12 Q16 18 15 24 Q14 32 12 40',
+                    'M12 40 Q10 35 11 28 Q9 22 10 16 Q8 10 12 0 Q16 10 15 16 Q17 22 16 28 Q15 35 12 40'
+                ];
+                return variations[Math.floor(Math.random() * variations.length)];
             }
 
             createEmber() {
                 const rect = this.cindrElement.getBoundingClientRect();
-                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.4;
+                const bottomX = rect.left + (rect.width / 2) + (Math.random() - 0.5) * rect.width * 0.5;
                 const bottomY = rect.bottom - 5;
 
                 const ember = document.createElement('div');
                 ember.className = 'cindr-ember';
                 ember.style.cssText = `
                     position: absolute;
-                    width: 3px;
-                    height: 3px;
-                    background: radial-gradient(circle, #ff6600 0%, #ff4400 100%);
+                    width: 4px;
+                    height: 4px;
+                    background: radial-gradient(circle, #ff5500 0%, #ff3300 50%, #cc2200 100%);
                     border-radius: 50%;
                     pointer-events: none;
                     z-index: 1001;
                     left: ${bottomX}px;
                     top: ${bottomY}px;
-                    animation: emberFloat ${2 + Math.random() * 1.5}s ease-out forwards;
-                    box-shadow: 0 0 4px rgba(255, 100, 0, 0.8);
+                    animation: emberDrift ${2.5 + Math.random() * 1}s ease-out forwards;
+                    box-shadow: 0 0 6px rgba(255, 85, 0, 0.9), 0 0 12px rgba(255, 120, 0, 0.6);
                 `;
 
                 document.body.appendChild(ember);
@@ -686,7 +733,7 @@
                         ember.parentNode.removeChild(ember);
                         this.embers = this.embers.filter(e => e !== ember);
                     }
-                }, 3500);
+                }, 4000);
             }
 
             stopBurning() {
