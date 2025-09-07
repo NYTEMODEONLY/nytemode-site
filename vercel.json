@@ -26,16 +26,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "src/pages/api/*.js": {
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
-    }
   ]
 }
